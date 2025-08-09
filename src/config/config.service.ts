@@ -1,7 +1,8 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSourceOptions } from 'typeorm';
+import * as dotenv from 'dotenv';
 
-require('dotenv').config();
+dotenv.config();
 
 class ConfigService {
   constructor(private env: { [k: string]: string | undefined }) {}
@@ -39,15 +40,13 @@ class ConfigService {
       password: this.getValue('POSTGRES_PASSWORD'),
       database: this.getValue('POSTGRES_DATABASE'),
 
-      entities: ['**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 
       migrationsTableName: 'migration',
 
-      migrations: ['src/migration/*.ts'],
+      migrations: [__dirname + '/../migration/*.ts'],
 
-      //   cli: {
-      //     migrationsDir: 'src/migration',
-      //   },
+      autoLoadEntities: true,
 
       ssl: this.isProduction() ? true : { rejectUnauthorized: false },
     };
@@ -63,11 +62,11 @@ class ConfigService {
       password: this.getValue('POSTGRES_PASSWORD'),
       database: this.getValue('POSTGRES_DATABASE'),
 
-      entities: ['src/models/*.entity.ts'],
+      entities: [__dirname + '/../models/*.entity.ts'],
 
       migrationsTableName: 'migration',
 
-      migrations: ['src/migration/*.ts'],
+      migrations: [__dirname + '/../migration/*.ts'],
 
       ssl: this.isProduction() ? true : { rejectUnauthorized: false },
     };
