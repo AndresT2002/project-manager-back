@@ -1,6 +1,8 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany, ManyToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Role } from './enums';
+import { Project } from './project.entity';
+import { Task } from './task.entity';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
@@ -25,4 +27,14 @@ export class User extends BaseEntity {
     default: Role.MEMBER,
   })
   role: Role;
+
+  // Relaciones
+  @OneToMany(() => Project, (project) => project.owner)
+  ownedProjects: Project[];
+
+  @ManyToMany(() => Project, (project) => project.members)
+  memberProjects: Project[];
+
+  @OneToMany(() => Task, (task) => task.assignee)
+  assignedTasks: Task[];
 }

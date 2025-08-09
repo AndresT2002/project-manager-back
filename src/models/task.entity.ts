@@ -1,6 +1,8 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { TaskStatus } from './enums';
+import { User } from './user.entity';
+import { Project } from './project.entity';
 @Entity({ name: 'task' })
 export class Task extends BaseEntity {
   @Column({ type: 'varchar', length: 300 })
@@ -16,10 +18,10 @@ export class Task extends BaseEntity {
   })
   status: TaskStatus;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column({ type: 'uuid' })
   projectId: string;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column({ type: 'uuid' })
   assigneeId: string;
 
   @Column({ type: 'timestamptz' })
@@ -27,4 +29,13 @@ export class Task extends BaseEntity {
 
   @Column({ type: 'timestamptz' })
   startDate: Date;
+
+  // Relaciones
+  @ManyToOne(() => Project, (project) => project.tasks)
+  @JoinColumn({ name: 'projectId' })
+  project: Project;
+
+  @ManyToOne(() => User, (user) => user.assignedTasks)
+  @JoinColumn({ name: 'assigneeId' })
+  assignee: User;
 }
