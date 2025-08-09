@@ -11,11 +11,18 @@ export class User extends BaseEntity {
   lastName: string;
 
   @Column({ type: 'varchar', length: 300 })
+  fullName: string;
+
+  @Column({ type: 'varchar', length: 300 })
   email: string;
 
   @Column({ type: 'varchar', length: 300 })
   password: string;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.MEMBER,
+  })
   role: Role;
 }

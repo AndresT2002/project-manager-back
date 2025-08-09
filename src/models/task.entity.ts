@@ -9,7 +9,11 @@ export class Task extends BaseEntity {
   @Column({ type: 'varchar', length: 300 })
   description: string;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column({
+    type: 'enum',
+    enum: TaskStatus,
+    default: TaskStatus.TODO,
+  })
   status: TaskStatus;
 
   @Column({ type: 'varchar', length: 300 })
