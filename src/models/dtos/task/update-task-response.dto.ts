@@ -10,4 +10,12 @@ export class UpdateTaskResponseDto extends UpdateTaskRequestDto {
   @IsUUID()
   @IsNotEmpty()
   id: string;
+
+  @ApiProperty({
+    description: 'The created by of the task',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  readonly createdBy: string;
 }

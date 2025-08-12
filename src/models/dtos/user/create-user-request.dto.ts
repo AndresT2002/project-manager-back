@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { Role } from 'src/models/enums';
 import { Transform } from 'class-transformer';
 
@@ -46,4 +46,12 @@ export class CreateUserDto {
   @IsEnum(Role)
   @IsNotEmpty()
   readonly role: Role;
+
+  @ApiProperty({
+    description: 'The created by of the user',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  readonly createdBy: string;
 }
