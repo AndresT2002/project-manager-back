@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Expose, Transform } from 'class-transformer';
 import { TaskStatus } from 'src/models/enums';
-import { PaginatedResponseDto } from '../common/pagination.dto';
+import { PaginationMetaDto } from '../common/pagination.dto';
 
 export class GetTaskResponseDto {
   @ApiProperty({
@@ -135,4 +135,16 @@ export class GetTaskResponseDto {
 }
 
 // Usar el DTO genérico de paginación
-export type GetTasksResponseDto = PaginatedResponseDto<GetTaskResponseDto>;
+export class GetTasksResponseDto {
+  @ApiProperty({
+    description: 'Array of tasks for the current page',
+    type: [GetTaskResponseDto],
+  })
+  readonly data: GetTaskResponseDto[];
+
+  @ApiProperty({
+    description: 'Pagination metadata',
+    type: PaginationMetaDto,
+  })
+  readonly meta: PaginationMetaDto;
+}
