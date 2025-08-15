@@ -38,7 +38,7 @@ export class TaskService {
     const skip = (page - 1) * pageSize;
 
     // Construir condiciones de búsqueda
-    const whereConditions: any = {};
+    const whereConditions: Record<string, unknown> = {};
 
     // Filtros básicos
     if (query.status) whereConditions.status = query.status;
@@ -73,7 +73,8 @@ export class TaskService {
     const sortOrder = query.sortOrder ?? 'DESC';
 
     // Construir condiciones de búsqueda
-    let whereClause = whereConditions;
+    let whereClause: Record<string, unknown> | Record<string, unknown>[] =
+      whereConditions;
     if (query.search) {
       whereClause = [
         { ...whereConditions, title: { $ilike: `%${query.search}%` } },

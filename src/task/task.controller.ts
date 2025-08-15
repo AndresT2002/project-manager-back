@@ -24,7 +24,6 @@ import {
   GetTaskResponseDto,
   GetTasksQueryDto,
 } from 'src/models/dtos/task';
-import { PaginationQueryDto } from 'src/models/dtos/common/pagination.dto';
 
 @ApiTags('tasks')
 @Controller('task')

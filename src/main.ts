@@ -40,4 +40,4 @@ async function bootstrap() {
     `Documentación Swagger en: http://localhost:${process.env.PORT ?? 4000}/api`,
   );
 }
-bootstrap();
+void bootstrap();

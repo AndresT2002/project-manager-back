@@ -6,7 +6,10 @@ import { configService } from './config/config.service';
 import { TaskModule } from './task/task.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(configService.getTypeOrmConfig()), TaskModule],
+  imports: [
+    TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
+    TaskModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

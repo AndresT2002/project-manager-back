@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { UpdateUserDto } from './update-user-request.dto';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 

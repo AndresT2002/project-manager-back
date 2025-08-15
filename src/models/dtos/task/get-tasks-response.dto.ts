@@ -7,7 +7,7 @@ import {
   IsDateString,
   IsBoolean,
 } from 'class-validator';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { TaskStatus } from 'src/models/enums';
 import { PaginationMetaDto } from '../common/pagination.dto';
 
@@ -72,8 +72,8 @@ export class GetTaskResponseDto {
     example: '2024-01-01T10:00:00Z',
   })
   @Expose()
-  @Transform(({ value }) =>
-    value instanceof Date ? value.toISOString() : value,
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
   )
   @IsDateString()
   @IsNotEmpty()
@@ -84,8 +84,8 @@ export class GetTaskResponseDto {
     example: '2024-01-01T09:00:00Z',
   })
   @Expose()
-  @Transform(({ value }) =>
-    value instanceof Date ? value.toISOString() : value,
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
   )
   @IsDateString()
   @IsNotEmpty()
@@ -114,8 +114,8 @@ export class GetTaskResponseDto {
     example: '2024-01-15T10:30:00.000Z',
   })
   @Expose()
-  @Transform(({ value }) =>
-    value instanceof Date ? value.toISOString() : value,
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
   )
   @IsDateString()
   @IsNotEmpty()
@@ -126,8 +126,8 @@ export class GetTaskResponseDto {
     example: '2024-01-15T10:30:00.000Z',
   })
   @Expose()
-  @Transform(({ value }) =>
-    value instanceof Date ? value.toISOString() : value,
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
   )
   @IsDateString()
   @IsNotEmpty()
