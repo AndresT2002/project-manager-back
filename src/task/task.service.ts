@@ -142,7 +142,7 @@ export class TaskService {
     // 2. Mergea propiedades de forma segura
     Object.assign(task, updateTaskDto);
 
-    // 3. Guardar el task actualizado
+    // 3. Guardar el task actualizado, esto funciona porque TypeORM detecta los cambios y actualiza solo los campos que han cambiado , en base al id del task (objeto) que se le pasa al save
     const updatedTask = await this.repo.save(task);
 
     // 4. Retornar el task actualizado
