@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateTaskRequestDto,
   GetTaskResponseDto,
@@ -10,15 +10,26 @@ import { Task } from 'src/models/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
-import { PaginationQueryDto } from 'src/models/dtos/common/pagination.dto';
+import { GetTaskQueryDto } from 'src/models/dtos/task/get-task-query.dto';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly repo: Repository<Task>,
   ) {}
-  create(createTaskDto: CreateTaskRequestDto) {
-    return 'This action adds a new task';
+  async create(createTaskDto: CreateTaskRequestDto) {
+    // Todo: Pendiente agregar el createdBy, que es el id del usuario que crea la tarea, que se obtiene del token de autenticación
+
+    // 1. Convertir el DTO a una entidad
+    const task = this.repo.create(createTaskDto);
+
+    // 2. Guardar la entidad en la base de datos
+    const savedTask = await this.repo.save(task);
+
+    // 3. Retornar el DTO convertido
+    return plainToInstance(GetTaskResponseDto, savedTask, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async findAll(query: GetTasksQueryDto): Promise<GetTasksResponseDto> {
@@ -107,15 +118,48 @@ export class TaskService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(query: GetTaskQueryDto): Promise<GetTaskResponseDto> {
+    const task = await this.repo.findOne({
+      where: { id: query.id },
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+    return plainToInstance(GetTaskResponseDto, task, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  update(id: number, updateTaskDto: UpdateTaskRequestDto) {
-    return `This action updates a #${id} task`;
+  async update(id: string, updateTaskDto: UpdateTaskRequestDto) {
+    // 1. Validar que el task exista
+    const task = await this.repo.findOne({ where: { id } });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    // 2. Mergea propiedades de forma segura
+    Object.assign(task, updateTaskDto);
+
+    // 3. Guardar el task actualizado
+    const updatedTask = await this.repo.save(task);
+
+    // 4. Retornar el task actualizado
+    return plainToInstance(GetTaskResponseDto, updatedTask, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(id: string): Promise<boolean> {
+    //Al usar el delete, se retorna un objeto con el número de filas afectadas
+    //Si el número de filas afectadas es 0, significa que el task no existe, por lo que nos ahorramos una consulta a la base de datos y lanza un error
+
+    const result = await this.repo.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return true;
   }
 }

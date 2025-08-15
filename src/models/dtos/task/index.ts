@@ -4,7 +4,6 @@ export { UpdateTaskRequestDto } from './update-task-request.dto';
 
 // Response DTOs
 export { CreateTaskResponseDto } from './create-task-response.dto';
-export { UpdateTaskResponseDto } from './update-task-response.dto';
 export {
   GetTaskResponseDto,
   GetTasksResponseDto,

@@ -49,7 +49,9 @@ export class TaskController {
     status: 400,
     description: 'Datos inválidos',
   })
-  create(@Body() createTaskDto: CreateTaskRequestDto) {
+  create(
+    @Body() createTaskDto: CreateTaskRequestDto,
+  ): Promise<GetTaskResponseDto> {
     return this.taskService.create(createTaskDto);
   }
 
@@ -147,7 +149,7 @@ export class TaskController {
     description: 'Lista de tareas obtenida exitosamente',
     type: GetTasksResponseDto,
   })
-  findAll(@Query() query: GetTasksQueryDto) {
+  findAll(@Query() query: GetTasksQueryDto): Promise<GetTasksResponseDto> {
     return this.taskService.findAll(query);
   }
 
@@ -170,8 +172,8 @@ export class TaskController {
     status: 404,
     description: 'Tarea no encontrada',
   })
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
+  findOne(@Param('id') id: string): Promise<GetTaskResponseDto> {
+    return this.taskService.findOne({ id });
   }
 
   @Patch(':id')
@@ -201,8 +203,11 @@ export class TaskController {
     status: 400,
     description: 'Datos inválidos',
   })
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskRequestDto) {
-    return this.taskService.update(+id, updateTaskDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskRequestDto,
+  ): Promise<GetTaskResponseDto> {
+    return this.taskService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
@@ -223,7 +228,7 @@ export class TaskController {
     status: 404,
     description: 'Tarea no encontrada',
   })
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
+  remove(@Param('id') id: string): Promise<boolean> {
+    return this.taskService.remove(id);
   }
 }
