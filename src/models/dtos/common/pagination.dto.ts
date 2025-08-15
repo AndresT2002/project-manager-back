@@ -2,6 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsBoolean, Min, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
+/**
+ * DTO para la metadata de la paginación, es decir,
+ * el numero de paginas, el numero de elementos por pagina,
+ * el numero total de elementos, el numero de paginas,
+ * si hay una pagina siguiente, si hay una pagina anterior,
+ * el numero de elementos en la pagina actual
+ * se usa para responder a las peticiones de la paginación
+ */
 export class PaginationMetaDto {
   @ApiProperty({
     description: 'Current page number',
@@ -62,6 +70,11 @@ export class PaginationMetaDto {
   readonly itemCount: number;
 }
 
+/**
+ * DTO para la consulta de la paginación, es decir,
+ * el numero de pagina y el numero de elementos por pagina,
+ * se usa para consultar las peticiones de la paginación
+ */
 export class PaginationQueryDto {
   @ApiProperty({
     description: 'Page number (starts from 1)',
@@ -91,6 +104,11 @@ export class PaginationQueryDto {
   readonly pageSize?: number = 10;
 }
 
+/**
+ * DTO para la respuesta de la paginación, es decir,
+ * el array de elementos y la metadata de la paginación,
+ * se usa para responder a las peticiones de la paginación
+ */
 export class PaginatedResponseDto<T> {
   @ApiProperty({
     description: 'Array of items for the current page',

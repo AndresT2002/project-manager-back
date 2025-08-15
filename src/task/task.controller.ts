@@ -22,6 +22,7 @@ import {
   UpdateTaskRequestDto,
   GetTasksResponseDto,
   GetTaskResponseDto,
+  GetTasksQueryDto,
 } from 'src/models/dtos/task';
 import { PaginationQueryDto } from 'src/models/dtos/common/pagination.dto';
 
@@ -55,7 +56,8 @@ export class TaskController {
   @Get()
   @ApiOperation({
     summary: 'Obtener todas las tareas',
-    description: 'Retorna una lista paginada de todas las tareas',
+    description:
+      'Retorna una lista paginada de todas las tareas con filtros opcionales',
   })
   @ApiQuery({
     name: 'page',
@@ -71,12 +73,81 @@ export class TaskController {
     description: 'Elementos por página (por defecto: 10)',
     example: 10,
   })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['todo', 'in_progress', 'done'],
+    description: 'Filtrar por estado de la tarea',
+  })
+  @ApiQuery({
+    name: 'projectId',
+    required: false,
+    type: String,
+    description: 'Filtrar por ID del proyecto',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiQuery({
+    name: 'assigneeId',
+    required: false,
+    type: String,
+    description: 'Filtrar por ID del asignado',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiQuery({
+    name: 'createdBy',
+    required: false,
+    type: String,
+    description: 'Filtrar por ID del creador',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiQuery({
+    name: 'dueDateAfter',
+    required: false,
+    type: String,
+    description:
+      'Filtrar tareas con fecha de vencimiento después de esta fecha',
+    example: '2024-01-01T00:00:00Z',
+  })
+  @ApiQuery({
+    name: 'dueDateBefore',
+    required: false,
+    type: String,
+    description: 'Filtrar tareas con fecha de vencimiento antes de esta fecha',
+    example: '2024-12-31T23:59:59Z',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Buscar en título y descripción de la tarea',
+    example: 'implement feature',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: [
+      'id',
+      'title',
+      'status',
+      'dueDate',
+      'startDate',
+      'createdAt',
+      'updatedAt',
+    ],
+    description: 'Campo por el cual ordenar (por defecto: createdAt)',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    enum: ['ASC', 'DESC'],
+    description: 'Orden de clasificación (por defecto: DESC)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de tareas obtenida exitosamente',
     type: GetTasksResponseDto,
   })
-  findAll(@Query() query: PaginationQueryDto) {
+  findAll(@Query() query: GetTasksQueryDto) {
     return this.taskService.findAll(query);
   }
 
