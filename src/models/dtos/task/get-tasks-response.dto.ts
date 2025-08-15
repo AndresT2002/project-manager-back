@@ -7,14 +7,16 @@ import {
   IsDateString,
   IsBoolean,
 } from 'class-validator';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { TaskStatus } from 'src/models/enums';
-import { PaginatedResponseDto } from '../common/pagination.dto';
+import { PaginationMetaDto } from '../common/pagination.dto';
 
 export class GetTaskResponseDto {
   @ApiProperty({
     description: 'The ID of the task',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @Expose()
   @IsUUID()
   @IsNotEmpty()
   readonly id: string;
@@ -23,6 +25,7 @@ export class GetTaskResponseDto {
     description: 'The title of the task',
     example: 'Task 1',
   })
+  @Expose()
   @IsString()
   @IsNotEmpty()
   readonly title: string;
@@ -31,6 +34,7 @@ export class GetTaskResponseDto {
     description: 'The description of the task',
     example: 'Task 1 description',
   })
+  @Expose()
   @IsString()
   @IsNotEmpty()
   readonly description: string;
@@ -40,6 +44,7 @@ export class GetTaskResponseDto {
     example: TaskStatus.TODO,
     enum: TaskStatus,
   })
+  @Expose()
   @IsEnum(TaskStatus)
   @IsNotEmpty()
   readonly status: TaskStatus;
@@ -48,6 +53,7 @@ export class GetTaskResponseDto {
     description: 'The project ID of the task',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @Expose()
   @IsUUID()
   @IsNotEmpty()
   readonly projectId: string;
@@ -56,6 +62,7 @@ export class GetTaskResponseDto {
     description: 'The assignee ID of the task',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @Expose()
   @IsUUID()
   @IsNotEmpty()
   readonly assigneeId: string;
@@ -64,6 +71,10 @@ export class GetTaskResponseDto {
     description: 'The due date of the task',
     example: '2024-01-01T10:00:00Z',
   })
+  @Expose()
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
+  )
   @IsDateString()
   @IsNotEmpty()
   readonly dueDate: string;
@@ -72,6 +83,10 @@ export class GetTaskResponseDto {
     description: 'The start date of the task',
     example: '2024-01-01T09:00:00Z',
   })
+  @Expose()
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
+  )
   @IsDateString()
   @IsNotEmpty()
   readonly startDate: string;
@@ -80,6 +95,7 @@ export class GetTaskResponseDto {
     description: 'The ID of the user who created this task',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @Expose()
   @IsUUID()
   @IsNotEmpty()
   readonly createdBy: string;
@@ -88,6 +104,7 @@ export class GetTaskResponseDto {
     description: 'Whether the task is active',
     example: true,
   })
+  @Expose()
   @IsBoolean()
   @IsNotEmpty()
   readonly isActive: boolean;
@@ -96,6 +113,10 @@ export class GetTaskResponseDto {
     description: 'When the task was created',
     example: '2024-01-15T10:30:00.000Z',
   })
+  @Expose()
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
+  )
   @IsDateString()
   @IsNotEmpty()
   readonly createdAt: string;
@@ -104,10 +125,26 @@ export class GetTaskResponseDto {
     description: 'When the task was last updated',
     example: '2024-01-15T10:30:00.000Z',
   })
+  @Expose()
+  @Transform(({ value }: TransformFnParams): string =>
+    value instanceof Date ? value.toISOString() : String(value),
+  )
   @IsDateString()
   @IsNotEmpty()
   readonly updatedAt: string;
 }
 
 // Usar el DTO genérico de paginación
-export type GetTasksResponseDto = PaginatedResponseDto<GetTaskResponseDto>;
+export class GetTasksResponseDto {
+  @ApiProperty({
+    description: 'Array of tasks for the current page',
+    type: [GetTaskResponseDto],
+  })
+  readonly data: GetTaskResponseDto[];
+
+  @ApiProperty({
+    description: 'Pagination metadata',
+    type: PaginationMetaDto,
+  })
+  readonly meta: PaginationMetaDto;
+}

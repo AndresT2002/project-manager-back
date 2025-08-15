@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, TransformFnParams } from 'class-transformer';
 import { TaskStatus } from 'src/models/enums';
 
 export class UpdateTaskRequestDto {
@@ -54,7 +54,13 @@ export class UpdateTaskRequestDto {
     example: '2024-01-01T10:00:00Z',
     required: false,
   })
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Transform(({ value }: TransformFnParams): Date | undefined =>
+    value
+      ? value instanceof Date
+        ? value
+        : new Date(String(value))
+      : undefined,
+  )
   @IsDate()
   @IsOptional()
   dueDate?: Date;
@@ -64,7 +70,13 @@ export class UpdateTaskRequestDto {
     example: '2024-01-01T09:00:00Z',
     required: false,
   })
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Transform(({ value }: TransformFnParams): Date | undefined =>
+    value
+      ? value instanceof Date
+        ? value
+        : new Date(String(value))
+      : undefined,
+  )
   @IsDate()
   @IsOptional()
   startDate?: Date;

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsUUID, IsDateString } from 'class-validator';
 import { TaskStatus } from 'src/models/enums';
 import { PaginationQueryDto } from '../common/pagination.dto';
-import { Transform } from 'class-transformer';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class GetTasksQueryDto extends PaginationQueryDto {
   @ApiProperty({
@@ -65,7 +65,9 @@ export class GetTasksQueryDto extends PaginationQueryDto {
     required: false,
   })
   @IsOptional()
-  @Transform(({ value }) => value?.trim())
+  @Transform(({ value }: TransformFnParams): string | undefined =>
+    typeof value === 'string' ? value.trim() : undefined,
+  )
   readonly search?: string;
 
   @ApiProperty({

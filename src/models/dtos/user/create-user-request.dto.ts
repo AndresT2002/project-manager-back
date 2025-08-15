@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { Role } from 'src/models/enums';
-import { Transform } from 'class-transformer';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -10,7 +10,9 @@ export class CreateUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }: TransformFnParams): string =>
+    typeof value === 'string' ? value.trim() : '',
+  )
   readonly name: string;
 
   @ApiProperty({
@@ -19,7 +21,9 @@ export class CreateUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }: TransformFnParams): string =>
+    typeof value === 'string' ? value.trim() : '',
+  )
   readonly lastName: string;
 
   @ApiProperty({
@@ -28,7 +32,9 @@ export class CreateUserDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  @Transform(({ value }) => value.toLowerCase().trim())
+  @Transform(({ value }: TransformFnParams): string =>
+    typeof value === 'string' ? value.toLowerCase().trim() : '',
+  )
   readonly email: string;
 
   @ApiProperty({
