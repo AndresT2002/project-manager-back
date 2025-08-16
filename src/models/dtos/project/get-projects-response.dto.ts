@@ -1,20 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsString,
   IsUUID,
   IsDateString,
   IsBoolean,
+  IsDate,
 } from 'class-validator';
-import { Role } from 'src/models/enums';
 import { PaginationMetaDto } from '../common/pagination.dto';
-import { Expose } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 
-export class GetUserResponseDto {
+export class GetProjectResponseDto {
   @ApiProperty({
-    description: 'The ID of the user',
+    description: 'The ID of the project',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @Expose()
@@ -23,8 +21,8 @@ export class GetUserResponseDto {
   readonly id: string;
 
   @ApiProperty({
-    description: 'The name of the user',
-    example: 'John',
+    description: 'The name of the project',
+    example: 'Project 1',
   })
   @Expose()
   @IsString()
@@ -32,44 +30,46 @@ export class GetUserResponseDto {
   readonly name: string;
 
   @ApiProperty({
-    description: 'The last name of the user',
-    example: 'Doe',
+    description: 'The description of the project',
+    example: 'Project 1 description',
   })
   @Expose()
   @IsString()
   @IsNotEmpty()
-  readonly lastName: string;
+  @Transform(({ value }: TransformFnParams): string =>
+    typeof value === 'string' ? value.trim() : '',
+  )
+  readonly description: string;
 
   @ApiProperty({
-    description: 'The full name of the user',
-    example: 'John Doe',
+    description: 'The start date of the project',
+    example: '2024-01-01T10:00:00Z',
   })
   @Expose()
-  @IsString()
+  @IsDate()
   @IsNotEmpty()
-  readonly fullName: string;
+  readonly startDate: Date;
 
   @ApiProperty({
-    description: 'The email of the user',
-    example: 'john.doe@example.com',
+    description: 'The end date of the project',
+    example: '2024-01-01T10:00:00Z',
   })
   @Expose()
-  @IsEmail()
+  @IsDate()
   @IsNotEmpty()
-  readonly email: string;
+  readonly endDate: Date;
 
   @ApiProperty({
-    description: 'The role of the user',
-    example: Role.MEMBER,
-    enum: Role,
+    description: 'The owner ID of the project',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @Expose()
-  @IsEnum(Role)
+  @IsUUID()
   @IsNotEmpty()
-  readonly role: Role;
+  readonly ownerId: string;
 
   @ApiProperty({
-    description: 'The ID of the user who created this user',
+    description: 'The ID of the user who created this project',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @Expose()
@@ -78,7 +78,7 @@ export class GetUserResponseDto {
   readonly createdBy: string;
 
   @ApiProperty({
-    description: 'The is active of the user',
+    description: 'The is active of the project',
     example: true,
   })
   @Expose()
@@ -87,7 +87,7 @@ export class GetUserResponseDto {
   readonly isActive: boolean;
 
   @ApiProperty({
-    description: 'When the user was created',
+    description: 'When the project was created',
     example: '2024-01-15T10:30:00.000Z',
   })
   @Expose()
@@ -96,7 +96,7 @@ export class GetUserResponseDto {
   readonly createdAt: string;
 
   @ApiProperty({
-    description: 'When the user was last updated',
+    description: 'When the project was last updated',
     example: '2024-01-15T10:30:00.000Z',
   })
   @Expose()
@@ -106,12 +106,12 @@ export class GetUserResponseDto {
 }
 
 // Usar el DTO genérico de paginación
-export class GetUsersResponseDto {
+export class GetProjectsResponseDto {
   @ApiProperty({
-    description: 'Array of users for the current page',
-    type: [GetUserResponseDto],
+    description: 'Array of projects for the current page',
+    type: [GetProjectResponseDto],
   })
-  readonly data: GetUserResponseDto[];
+  readonly data: GetProjectResponseDto[];
 
   @ApiProperty({
     description: 'Pagination metadata',

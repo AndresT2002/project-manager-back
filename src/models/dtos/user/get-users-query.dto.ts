@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsBoolean, IsUUID } from 'class-validator';
 import { Role } from 'src/models/enums';
 import { PaginationQueryDto } from '../common/pagination.dto';
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 
 export class GetUsersQueryDto extends PaginationQueryDto {
   @ApiProperty({
@@ -11,6 +11,7 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     required: false,
   })
   @IsEnum(Role)
+  @Expose()
   @IsOptional()
   readonly role?: Role;
 
@@ -20,7 +21,17 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     required: false,
   })
   @IsBoolean()
+  @Expose()
   @IsOptional()
+  @Transform(({ value }: TransformFnParams): boolean | undefined => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      if (value.toLowerCase() === 'true') return true;
+      if (value.toLowerCase() === 'false') return false;
+    }
+    return undefined;
+  })
   readonly isActive?: boolean;
 
   @ApiProperty({
@@ -29,6 +40,7 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     required: false,
   })
   @IsUUID()
+  @Expose()
   @IsOptional()
   readonly createdBy?: string;
 
@@ -37,6 +49,7 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     example: 'john doe',
     required: false,
   })
+  @Expose()
   @IsOptional()
   @Transform(({ value }: TransformFnParams): string | undefined =>
     typeof value === 'string' ? value.trim() : undefined,
@@ -60,6 +73,7 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     required: false,
     default: 'createdAt',
   })
+  @Expose()
   @IsOptional()
   readonly sortBy?: string = 'createdAt';
 
@@ -70,6 +84,7 @@ export class GetUsersQueryDto extends PaginationQueryDto {
     required: false,
     default: 'DESC',
   })
+  @Expose()
   @IsOptional()
   readonly sortOrder?: 'ASC' | 'DESC' = 'DESC';
 }

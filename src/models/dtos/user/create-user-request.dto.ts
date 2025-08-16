@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { Role } from 'src/models/enums';
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 
 export class CreateUserDto {
   @ApiProperty({
     description: 'The name of the user',
     example: 'John',
   })
+  @Expose()
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams): string =>
@@ -19,6 +20,7 @@ export class CreateUserDto {
     description: 'The last name of the user',
     example: 'Doe',
   })
+  @Expose()
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams): string =>
@@ -30,6 +32,7 @@ export class CreateUserDto {
     description: 'The email of the user',
     example: 'john.doe@example.com',
   })
+  @Expose()
   @IsEmail()
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams): string =>
@@ -41,6 +44,7 @@ export class CreateUserDto {
     description: 'The password of the user',
     example: 'password',
   })
+  @Expose()
   @IsString()
   @IsNotEmpty()
   readonly password: string;
@@ -49,6 +53,7 @@ export class CreateUserDto {
     description: 'The role of the user',
     example: Role.ADMIN,
   })
+  @Expose()
   @IsEnum(Role)
   @IsNotEmpty()
   readonly role: Role;
@@ -57,6 +62,7 @@ export class CreateUserDto {
     description: 'The created by of the user',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @Expose()
   @IsUUID()
   @IsNotEmpty()
   readonly createdBy: string;
