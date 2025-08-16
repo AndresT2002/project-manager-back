@@ -68,7 +68,7 @@ export class ProjectService {
       excludeExtraneousValues: true,
     });
     return {
-      data: projectDtos as GetProjectResponseDto[],
+      data: projectDtos,
       meta: {
         page: page ?? 1,
         pageSize: pageSize ?? 10,

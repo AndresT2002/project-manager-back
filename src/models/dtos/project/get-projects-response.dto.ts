@@ -5,9 +5,10 @@ import {
   IsUUID,
   IsDateString,
   IsBoolean,
+  IsDate,
 } from 'class-validator';
 import { PaginationMetaDto } from '../common/pagination.dto';
-import { Expose } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 
 export class GetProjectResponseDto {
   @ApiProperty({
@@ -35,25 +36,28 @@ export class GetProjectResponseDto {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  readonly lastName: string;
+  @Transform(({ value }: TransformFnParams): string =>
+    typeof value === 'string' ? value.trim() : '',
+  )
+  readonly description: string;
 
   @ApiProperty({
     description: 'The start date of the project',
     example: '2024-01-01T10:00:00Z',
   })
   @Expose()
-  @IsString()
+  @IsDate()
   @IsNotEmpty()
-  readonly fullName: string;
+  readonly startDate: Date;
 
   @ApiProperty({
     description: 'The end date of the project',
     example: '2024-01-01T10:00:00Z',
   })
   @Expose()
-  @IsEmail()
+  @IsDate()
   @IsNotEmpty()
-  readonly email: string;
+  readonly endDate: Date;
 
   @ApiProperty({
     description: 'The owner ID of the project',
