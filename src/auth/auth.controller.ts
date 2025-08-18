@@ -25,6 +25,11 @@ import {
   LoginResponseDto,
   LogoutResponseDto,
 } from 'src/models/dtos/auth';
+import { User } from 'src/models/user.entity';
+
+interface RequestWithUser extends Request {
+  user: Omit<User, 'password'>;
+}
 
 @ApiTags('Autenticación')
 @Controller('auth')
@@ -50,7 +55,7 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Request() req): Promise<LoginResponseDto> {
+  login(@Request() req: RequestWithUser): LoginResponseDto {
     return this.authService.login(req.user);
   }
 
@@ -77,7 +82,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(): Promise<LogoutResponseDto> {
+  logout(): LogoutResponseDto {
     return this.authService.logout();
   }
 
@@ -142,7 +147,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('me')
   @HttpCode(HttpStatus.OK)
-  async getProfile(@GetUser() user: any) {
+  getProfile(@GetUser() user: Omit<User, 'password'>): Omit<User, 'password'> {
     return user;
   }
 }

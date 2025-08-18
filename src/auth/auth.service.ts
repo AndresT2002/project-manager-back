@@ -4,6 +4,20 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { LoginResponseDto } from 'src/models/dtos/auth';
+import { User } from 'src/models/user.entity';
+
+interface JwtPayload {
+  email: string;
+  sub: string;
+  role: string;
+  name: string;
+  fullName: string;
+}
+
+interface RefreshPayload {
+  sub: string;
+  type: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -17,9 +31,13 @@ export class AuthService {
     Se utiliza en el guard de local-auth.guard.ts para validar el usuario y contraseña.
     Si el usuario y contraseña son válidos, se permite el acceso a la ruta.
   */
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(
+    email: string,
+    pass: string,
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findOneByEmail(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
     }
@@ -32,8 +50,8 @@ export class AuthService {
     Si el usuario y contraseña son válidos, se permite el acceso a la ruta y por ende se crea el token de acceso y el token de actualización.
   
     */
-  async login(user: any): Promise<LoginResponseDto> {
-    const payload = {
+  login(user: Omit<User, 'password'>): LoginResponseDto {
+    const payload: JwtPayload = {
       email: user.email,
       sub: user.id,
       role: user.role,
@@ -47,7 +65,7 @@ export class AuthService {
     });
 
     const refreshToken = this.jwtService.sign(
-      { sub: user.id, type: 'refresh' },
+      { sub: user.id, type: 'refresh' } as RefreshPayload,
       {
         secret: jwtConstants.refreshSecret,
         expiresIn: jwtConstants.refreshExpiresIn,
@@ -90,7 +108,7 @@ export class AuthService {
         throw new UnauthorizedException('Usuario no encontrado');
       }
 
-      const newPayload = {
+      const newPayload: JwtPayload = {
         email: user.email,
         sub: user.id,
         role: user.role,
@@ -104,12 +122,12 @@ export class AuthService {
       });
 
       return { access_token: accessToken };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Token de actualización inválido');
     }
   }
 
-  async logout(): Promise<{ message: string; success: boolean }> {
+  logout(): { message: string; success: boolean } {
     return {
       message:
         'Sesión cerrada exitosamente. Elimina el token del almacenamiento local.',

@@ -3,6 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
 
+interface JwtPayload {
+  sub: string;
+  email: string;
+  role: string;
+  name: string;
+  fullName: string;
+}
+
 /*
     Esta estrategia es para validar el token JWT.
     Se utiliza en el guard de jwt-auth.guard.ts para validar el token.
@@ -20,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  validate(payload: JwtPayload) {
     return {
       id: payload.sub,
       email: payload.email,
