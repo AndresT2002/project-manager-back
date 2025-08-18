@@ -33,9 +33,11 @@ export class UserService {
     if (user) {
       throw new BadRequestException('User already exists');
     }
+
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: await bcrypt.hash(createUserDto.password, 10),
+      fullName: `${createUserDto.name} ${createUserDto.lastName}`,
     });
 
     // Guardar el usuario antes de retornarlo
@@ -157,5 +159,11 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return true;
+  }
+
+  async findOneByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { email: email.toLowerCase().trim() },
+    });
   }
 }
