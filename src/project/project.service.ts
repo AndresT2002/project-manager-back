@@ -42,31 +42,44 @@ export class ProjectService {
       sortBy,
       sortOrder,
     } = query;
-    const skip = (page ?? 1 - 1) * (pageSize ?? 10);
+    const skip = ((page ?? 1) - 1) * (pageSize ?? 10);
     const take = pageSize ?? 10;
     const order = { [sortBy ?? 'createdAt']: sortOrder ?? 'DESC' };
-    const where: FindOptionsWhere<Project> = {};
+
+    // Construir las condiciones where
+    const whereConditions: FindOptionsWhere<Project> = {};
     if (ownerId) {
-      where.ownerId = ownerId;
+      whereConditions.ownerId = ownerId;
     }
     if (memberId) {
-      where.members = In([memberId]);
+      whereConditions.members = In([memberId]);
     }
     if (taskId) {
-      where.tasks = In([taskId]);
+      whereConditions.tasks = In([taskId]);
     }
     if (search) {
-      where.name = Like(`%${search}%`);
+      whereConditions.name = Like(`%${search}%`);
     }
-    const [projects, total] = await this.projectRepository.findAndCount({
-      where,
+
+    // Construir las opciones de consulta
+    const findOptions: any = {
       skip,
       take,
       order,
-    });
+    };
+
+    // Solo agregar where si hay condiciones
+    if (Object.keys(whereConditions).length > 0) {
+      findOptions.where = whereConditions;
+    }
+
+    const [projects, total] =
+      await this.projectRepository.findAndCount(findOptions);
+
     const projectDtos = plainToInstance(GetProjectResponseDto, projects, {
       excludeExtraneousValues: true,
     });
+
     return {
       data: projectDtos,
       meta: {
