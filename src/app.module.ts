@@ -6,6 +6,7 @@ import { configService } from './config/config.service';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ProjectModule } from './project/project.module';
     TaskModule,
     UserModule,
     ProjectModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
