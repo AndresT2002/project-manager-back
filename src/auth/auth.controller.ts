@@ -8,6 +8,7 @@ import {
   HttpStatus,
   UnauthorizedException,
   Headers,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -26,6 +27,7 @@ import {
   LogoutResponseDto,
 } from 'src/models/dtos/auth';
 import { User } from 'src/models/user.entity';
+import { Response } from 'express';
 
 interface RequestWithUser extends Request {
   user: Omit<User, 'password'>;
@@ -82,7 +84,22 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(): LogoutResponseDto {
+  logout(@Res({ passthrough: true }) res: Response): LogoutResponseDto {
+    // Limpiar cookies HTTP-only con las mismas opciones que se usaron para crearlas
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
     return this.authService.logout();
   }
 
