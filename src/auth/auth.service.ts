@@ -168,22 +168,26 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
-    const user = await this.userRepository.findOne({
-      where: { email: registerDto.email },
-    });
-    if (user) {
-      throw new BadRequestException('User already exists');
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: registerDto.email },
+      });
+      if (user) {
+        throw new BadRequestException('User already exists');
+      }
+      const newUser = await this.userRepository.create({
+        ...registerDto,
+        password: await bcrypt.hash(registerDto.password, 10),
+        fullName: `${registerDto.name} ${registerDto.lastName}`,
+        role: Role.LEADER,
+      });
+      await this.userRepository.save(newUser);
+      const userResponse = plainToInstance(RegisterResponseDto, newUser, {
+        excludeExtraneousValues: true,
+      });
+      return userResponse;
+    } catch (error) {
+      throw new BadRequestException('Error registering user');
     }
-    const newUser = await this.userRepository.create({
-      ...registerDto,
-      password: await bcrypt.hash(registerDto.password, 10),
-      fullName: `${registerDto.name} ${registerDto.lastName}`,
-      role: Role.LEADER,
-    });
-    await this.userRepository.save(newUser);
-    const userResponse = plainToInstance(RegisterResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
-    return userResponse;
   }
 }

@@ -181,7 +181,9 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Usuario ya existe' })
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+  ): Promise<RegisterResponseDto> {
+    return await this.authService.register(registerDto);
   }
 }
