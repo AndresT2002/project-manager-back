@@ -15,7 +15,7 @@ export class User extends AuditableEntity {
   @Column({ type: 'varchar', length: 300 })
   fullName: string;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column({ type: 'varchar', length: 300, unique: true })
   email: string;
 
   @Column({ type: 'varchar', length: 300 })

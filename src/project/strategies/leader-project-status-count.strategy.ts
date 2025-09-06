@@ -17,41 +17,35 @@ export class LeaderProjectStatusCountStrategy
     user: AuthenticatedUser,
     projectRepository: Repository<Project>,
   ): Promise<GetProjectStatusCountsResponseDto> {
-    // Contar proyectos por cada status
-    const [openCount, finishedCount, cancelledCount] = await Promise.all([
-      projectRepository.count({
-        where: {
-          ownerId: user.id,
-          status: ProjectStatus.OPEN,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          ownerId: user.id,
-          status: ProjectStatus.FINISHED,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          ownerId: user.id,
-          status: ProjectStatus.CANCELLED,
-        },
-      }),
-    ]);
+    // Opción 2: Query Raw SQL (más eficiente - una sola consulta)
+    const rawResult = await projectRepository.query(
+      `
+      SELECT
+        COALESCE(SUM(CASE WHEN status = $1 THEN 1 ELSE 0 END), 0) as open,
+        COALESCE(SUM(CASE WHEN status = $2 THEN 1 ELSE 0 END), 0) as finished,
+        COALESCE(SUM(CASE WHEN status = $3 THEN 1 ELSE 0 END), 0) as cancelled
+      FROM project
+      WHERE "ownerId" = $4      
+    `,
+      [
+        ProjectStatus.OPEN,
+        ProjectStatus.FINISHED,
+        ProjectStatus.CANCELLED,
+        user.id,
+      ],
+    );
 
     const result = {
-      open: openCount,
-      finished: finishedCount,
-      cancelled: cancelledCount,
+      open: parseInt(rawResult[0].open),
+      finished: parseInt(rawResult[0].finished),
+      cancelled: parseInt(rawResult[0].cancelled),
     };
-    console.log('🔍 Leader Result:', result);
 
     const dto = new GetProjectStatusCountsResponseDto();
     dto.open = result.open;
     dto.finished = result.finished;
     dto.cancelled = result.cancelled;
 
-    console.log('🔍 Leader DTO:', dto);
     return dto;
   }
 }

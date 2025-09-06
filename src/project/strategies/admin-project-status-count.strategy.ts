@@ -17,39 +17,29 @@ export class AdminProjectStatusCountStrategy
     user: AuthenticatedUser,
     projectRepository: Repository<Project>,
   ): Promise<GetProjectStatusCountsResponseDto> {
-    // Contar TODOS los proyectos por cada status (para ADMIN)
-    const [openCount, finishedCount, cancelledCount] = await Promise.all([
-      projectRepository.count({
-        where: {
-          status: ProjectStatus.OPEN,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          status: ProjectStatus.FINISHED,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          status: ProjectStatus.CANCELLED,
-        },
-      }),
-    ]);
+    // Opción 2: Query Raw SQL (más eficiente - una sola consulta)
+    const rawResult = await projectRepository.query(
+      `
+      SELECT
+        COALESCE(SUM(CASE WHEN status = $1 THEN 1 ELSE 0 END), 0) as open,
+        COALESCE(SUM(CASE WHEN status = $2 THEN 1 ELSE 0 END), 0) as finished,
+        COALESCE(SUM(CASE WHEN status = $3 THEN 1 ELSE 0 END), 0) as cancelled
+      FROM project
+    `,
+      [ProjectStatus.OPEN, ProjectStatus.FINISHED, ProjectStatus.CANCELLED],
+    );
 
     const result = {
-      open: openCount,
-      finished: finishedCount,
-      cancelled: cancelledCount,
+      open: parseInt(rawResult[0].open),
+      finished: parseInt(rawResult[0].finished),
+      cancelled: parseInt(rawResult[0].cancelled),
     };
-
-    console.log('🔍 Admin Result:', result);
 
     const dto = new GetProjectStatusCountsResponseDto();
     dto.open = result.open;
     dto.finished = result.finished;
     dto.cancelled = result.cancelled;
 
-    console.log('🔍 Admin DTO:', dto);
     return dto;
   }
 }

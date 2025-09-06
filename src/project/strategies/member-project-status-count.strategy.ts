@@ -17,42 +17,36 @@ export class MemberProjectStatusCountStrategy
     user: AuthenticatedUser,
     projectRepository: Repository<Project>,
   ): Promise<GetProjectStatusCountsResponseDto> {
-    // Contar proyectos por cada status donde el usuario es miembro
-    const [openCount, finishedCount, cancelledCount] = await Promise.all([
-      projectRepository.count({
-        where: {
-          members: In([user.id]),
-          status: ProjectStatus.OPEN,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          members: In([user.id]),
-          status: ProjectStatus.FINISHED,
-        },
-      }),
-      projectRepository.count({
-        where: {
-          members: In([user.id]),
-          status: ProjectStatus.CANCELLED,
-        },
-      }),
-    ]);
+    // Opción 2: Query Raw SQL (más eficiente - una sola consulta)
+    const rawResult = await projectRepository.query(
+      `
+      SELECT
+        COALESCE(SUM(CASE WHEN p.status = $1 THEN 1 ELSE 0 END), 0) as open,
+        COALESCE(SUM(CASE WHEN p.status = $2 THEN 1 ELSE 0 END), 0) as finished,
+        COALESCE(SUM(CASE WHEN p.status = $3 THEN 1 ELSE 0 END), 0) as cancelled
+      FROM project p
+      INNER JOIN project_members pm ON p.id = pm.projectId
+      WHERE pm.userId = $4
+    `,
+      [
+        ProjectStatus.OPEN,
+        ProjectStatus.FINISHED,
+        ProjectStatus.CANCELLED,
+        user.id,
+      ],
+    );
 
     const result = {
-      open: openCount,
-      finished: finishedCount,
-      cancelled: cancelledCount,
+      open: parseInt(rawResult[0].open),
+      finished: parseInt(rawResult[0].finished),
+      cancelled: parseInt(rawResult[0].cancelled),
     };
-
-    console.log('🔍 Member Result:', result);
 
     const dto = new GetProjectStatusCountsResponseDto();
     dto.open = result.open;
     dto.finished = result.finished;
     dto.cancelled = result.cancelled;
 
-    console.log('🔍 Member DTO:', dto);
     return dto;
   }
 }
