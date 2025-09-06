@@ -14,3 +14,9 @@ export enum TaskStatus {
   IN_PROGRESS = 'in_progress',
   DONE = 'done',
 }
+
+export enum ProjectStatus {
+  OPEN = 'open',
+  FINISHED = 'finished',
+  CANCELLED = 'cancelled',
+}

@@ -14,8 +14,8 @@ if (!migrationName) {
 // Construir la ruta completa
 const migrationPath = `src/migration/${migrationName}`;
 
-// Ejecutar el comando TypeORM
-const command = `npm run typeorm -- migration:generate -d src/data-source.ts ${migrationPath}`;
+// Ejecutar el comando TypeORM directamente
+const command = `npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts ${migrationPath}`;
 
 try {
   console.log(`🚀 Generando migración: ${migrationName}`);

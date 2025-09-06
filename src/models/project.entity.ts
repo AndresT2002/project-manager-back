@@ -10,6 +10,7 @@ import {
 import { AuditableEntity } from './audit-base.entity';
 import { User } from './user.entity';
 import { Task } from './task.entity';
+import { ProjectStatus } from './enums';
 
 @Entity({ name: 'project' })
 export class Project extends AuditableEntity {
@@ -27,6 +28,13 @@ export class Project extends AuditableEntity {
 
   @Column({ type: 'uuid' })
   ownerId: string;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectStatus,
+    default: ProjectStatus.OPEN,
+  })
+  status: ProjectStatus;
 
   // Relaciones
   @ManyToOne(() => User, (user) => user.ownedProjects)
