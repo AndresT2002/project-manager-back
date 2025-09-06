@@ -26,7 +26,10 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<CreateUserResponseDto> {
+  async create(
+    createUserDto: CreateUserDto,
+    currentUser: User,
+  ): Promise<CreateUserResponseDto> {
     const user = await this.userRepository.findOne({
       where: { email: createUserDto.email.toLowerCase().trim() },
     });
@@ -38,6 +41,7 @@ export class UserService {
       ...createUserDto,
       password: await bcrypt.hash(createUserDto.password, 10),
       fullName: `${createUserDto.name} ${createUserDto.lastName}`,
+      createdBy: currentUser,
     });
 
     // Guardar el usuario antes de retornarlo

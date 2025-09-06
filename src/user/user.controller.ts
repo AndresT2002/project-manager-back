@@ -15,6 +15,8 @@ import {
   GetUsersQueryDto,
   UpdateUserDto,
 } from 'src/models/dtos/user';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/models/user.entity';
 
 /**
  * Controller para la gestión de usuarios
@@ -27,8 +29,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @GetUser() currentUser: User) {
+    return this.userService.create(createUserDto, currentUser);
   }
 
   @Get()

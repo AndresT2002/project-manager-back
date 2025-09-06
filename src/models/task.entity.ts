@@ -1,10 +1,12 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseEntity } from './base.entity';
+
 import { TaskStatus } from './enums';
 import { User } from './user.entity';
 import { Project } from './project.entity';
+import { AuditableEntity } from './audit-base.entity';
+
 @Entity({ name: 'task' })
-export class Task extends BaseEntity {
+export class Task extends AuditableEntity {
   @Column({ type: 'varchar', length: 300 })
   title: string;
 

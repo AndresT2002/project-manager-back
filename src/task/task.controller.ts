@@ -24,7 +24,8 @@ import {
   GetTaskResponseDto,
   GetTasksQueryDto,
 } from 'src/models/dtos/task';
-
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/models/user.entity';
 @ApiTags('tasks')
 @Controller('task')
 export class TaskController {
@@ -49,9 +50,10 @@ export class TaskController {
     description: 'Datos inválidos',
   })
   create(
+    @GetUser() currentUser: User,
     @Body() createTaskDto: CreateTaskRequestDto,
   ): Promise<GetTaskResponseDto> {
-    return this.taskService.create(createTaskDto);
+    return this.taskService.create(createTaskDto, currentUser);
   }
 
   @Get()

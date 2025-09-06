@@ -54,7 +54,8 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
   const userRepository = dataSource.getRepository(User);
   const hashedPassword = await bcrypt.hash('password123', 10);
 
-  const usersData = [
+  // Primero crear admin y líderes (sin createdById)
+  const initialUsersData = [
     {
       name: 'Juan',
       lastName: 'Pérez',
@@ -62,7 +63,8 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
       email: 'juan.perez@empresa.com',
       password: hashedPassword,
       role: Role.ADMIN,
-      createdBy: 'system',
+      createdById: null,
+      updatedById: null,
     },
     {
       name: 'María',
@@ -71,8 +73,20 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
       email: 'maria.garcia@empresa.com',
       password: hashedPassword,
       role: Role.LEADER,
-      createdBy: 'system',
+      createdById: null,
+      updatedById: null,
     },
+  ];
+
+  const initialUsers = userRepository.create(initialUsersData);
+  const savedInitialUsers = await userRepository.save(initialUsers);
+
+  // Obtener IDs de los usuarios creados
+  const admin = savedInitialUsers.find((u) => u.role === Role.ADMIN);
+  const leader = savedInitialUsers.find((u) => u.role === Role.LEADER);
+
+  // Crear miembros y líder adicional con relaciones de auditoría
+  const additionalUsersData = [
     {
       name: 'Carlos',
       lastName: 'López',
@@ -80,7 +94,8 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
       email: 'carlos.lopez@empresa.com',
       password: hashedPassword,
       role: Role.MEMBER,
-      createdBy: 'system',
+      createdById: admin?.id || null,
+      updatedById: admin?.id || null,
     },
     {
       name: 'Ana',
@@ -89,7 +104,8 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
       email: 'ana.martinez@empresa.com',
       password: hashedPassword,
       role: Role.MEMBER,
-      createdBy: 'system',
+      createdById: leader?.id || null,
+      updatedById: leader?.id || null,
     },
     {
       name: 'Luis',
@@ -98,12 +114,15 @@ async function createUsers(dataSource: DataSource): Promise<User[]> {
       email: 'luis.rodriguez@empresa.com',
       password: hashedPassword,
       role: Role.LEADER,
-      createdBy: 'system',
+      createdById: admin?.id || null,
+      updatedById: admin?.id || null,
     },
   ];
 
-  const users = userRepository.create(usersData);
-  return await userRepository.save(users);
+  const additionalUsers = userRepository.create(additionalUsersData);
+  const savedAdditionalUsers = await userRepository.save(additionalUsers);
+
+  return [...savedInitialUsers, ...savedAdditionalUsers];
 }
 
 async function createProjects(
@@ -122,7 +141,7 @@ async function createProjects(
       startDate: new Date('2024-01-01'),
       endDate: new Date('2024-06-30'),
       ownerId: admin?.id,
-      createdBy: admin?.id || 'system',
+      createdById: admin?.id || null,
     },
     {
       name: 'Aplicación Móvil E-commerce',
@@ -130,7 +149,7 @@ async function createProjects(
       startDate: new Date('2024-02-01'),
       endDate: new Date('2024-08-31'),
       ownerId: leader?.id,
-      createdBy: leader?.id || 'system',
+      createdById: leader?.id || null,
     },
     {
       name: 'Migración a la Nube',
@@ -138,7 +157,7 @@ async function createProjects(
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-09-30'),
       ownerId: admin?.id,
-      createdBy: admin?.id || 'system',
+      createdById: admin?.id || null,
     },
     {
       name: 'Sistema de Reportes',
@@ -147,7 +166,7 @@ async function createProjects(
       startDate: new Date('2024-04-01'),
       endDate: new Date('2024-10-31'),
       ownerId: leader?.id,
-      createdBy: leader?.id || 'system',
+      createdById: leader?.id || null,
     },
   ];
 
@@ -249,7 +268,7 @@ async function createTasks(
         assigneeId: assignee?.id,
         startDate,
         dueDate,
-        createdBy: project.ownerId,
+        createdById: project.owner?.id || null,
       });
 
       tasks.push(task);

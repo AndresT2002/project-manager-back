@@ -11,17 +11,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { GetTaskQueryDto } from 'src/models/dtos/task/get-task-query.dto';
-
+import { User } from 'src/models/user.entity';
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly repo: Repository<Task>,
   ) {}
-  async create(createTaskDto: CreateTaskRequestDto) {
+  async create(createTaskDto: CreateTaskRequestDto, currentUser: User) {
     // Todo: Pendiente agregar el createdBy, que es el id del usuario que crea la tarea, que se obtiene del token de autenticación
 
     // 1. Convertir el DTO a una entidad
-    const task = this.repo.create(createTaskDto);
+    const task = this.repo.create({
+      ...createTaskDto,
+      createdBy: currentUser,
+    });
 
     // 2. Guardar la entidad en la base de datos
     const savedTask = await this.repo.save(task);

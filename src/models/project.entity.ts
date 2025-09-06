@@ -7,12 +7,12 @@ import {
   JoinColumn,
   JoinTable,
 } from 'typeorm';
-import { BaseEntity } from './base.entity';
+import { AuditableEntity } from './audit-base.entity';
 import { User } from './user.entity';
 import { Task } from './task.entity';
 
 @Entity({ name: 'project' })
-export class Project extends BaseEntity {
+export class Project extends AuditableEntity {
   @Column({ type: 'varchar', length: 300 })
   name: string;
 

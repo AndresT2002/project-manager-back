@@ -1,11 +1,11 @@
 import { Column, Entity, OneToMany, ManyToMany } from 'typeorm';
-import { BaseEntity } from './base.entity';
 import { Role } from './enums';
 import { Project } from './project.entity';
 import { Task } from './task.entity';
+import { AuditableEntity } from './audit-base.entity';
 
 @Entity({ name: 'user' })
-export class User extends BaseEntity {
+export class User extends AuditableEntity {
   @Column({ type: 'varchar', length: 300 })
   name: string;
 
