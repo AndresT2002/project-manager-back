@@ -1,9 +1,12 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { jwtConstants } from './constants';
 import { AuthenticatedUser } from './get-user.decorator';
 import { Role } from 'src/models/enums';
+import { User } from 'src/models/user.entity';
 
 interface JwtPayload extends AuthenticatedUser {
   sub: string;
@@ -18,7 +21,10 @@ interface JwtPayload extends AuthenticatedUser {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -26,13 +32,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload): AuthenticatedUser {
+  async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
+    // Consultar BD para obtener datos actuales del usuario
+    const currentUser = await this.userRepository.findOne({
+      where: { id: payload.sub },
+      select: ['id', 'email', 'role', 'name', 'fullName'],
+    });
+
+    if (!currentUser) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
     return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role as Role,
-      name: payload.name,
-      fullName: payload.fullName,
+      id: currentUser.id,
+      email: currentUser.email,
+      role: currentUser.role,
+      name: currentUser.name,
+      fullName: currentUser.fullName,
     };
   }
 }
