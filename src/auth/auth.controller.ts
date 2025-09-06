@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { GetUser } from './get-user.decorator';
+import { GetUser, AuthenticatedUser } from './get-user.decorator';
 import {
   LoginRequestDto,
   LoginResponseDto,
@@ -164,7 +164,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('me')
   @HttpCode(HttpStatus.OK)
-  getProfile(@GetUser() user: Omit<User, 'password'>): Omit<User, 'password'> {
+  getProfile(@GetUser() user: AuthenticatedUser): AuthenticatedUser {
     return user;
   }
 }

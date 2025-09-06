@@ -98,7 +98,7 @@ export class GetTaskResponseDto {
   @Expose()
   @IsUUID()
   @IsNotEmpty()
-  readonly createdBy: string;
+  readonly createdById: string;
 
   @ApiProperty({
     description: 'Whether the task is active',

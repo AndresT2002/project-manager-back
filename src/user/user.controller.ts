@@ -10,6 +10,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { AuthenticatedUser } from '../auth/get-user.decorator';
 import {
   CreateUserDto,
   GetUsersQueryDto,
@@ -29,7 +30,10 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto, @GetUser() currentUser: User) {
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @GetUser() currentUser: AuthenticatedUser,
+  ) {
     return this.userService.create(createUserDto, currentUser);
   }
 

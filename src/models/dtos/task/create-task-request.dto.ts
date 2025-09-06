@@ -69,10 +69,10 @@ export class CreateTaskRequestDto {
   startDate: Date;
 
   @ApiProperty({
-    description: 'The created by of the task',
+    description: 'The created by ID of the task',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsUUID()
   @IsNotEmpty()
-  readonly createdBy: string;
+  readonly createdById: string;
 }

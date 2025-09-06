@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { User } from 'src/models/user.entity';
+import { AuthenticatedUser } from '../auth/get-user.decorator';
 import {
   CreateUserDto,
   CreateUserResponseDto,
@@ -28,7 +29,7 @@ export class UserService {
 
   async create(
     createUserDto: CreateUserDto,
-    currentUser: User,
+    currentUser: AuthenticatedUser,
   ): Promise<CreateUserResponseDto> {
     const user = await this.userRepository.findOne({
       where: { email: createUserDto.email.toLowerCase().trim() },
@@ -41,7 +42,9 @@ export class UserService {
       ...createUserDto,
       password: await bcrypt.hash(createUserDto.password, 10),
       fullName: `${createUserDto.name} ${createUserDto.lastName}`,
-      createdBy: currentUser,
+      createdBy: {
+        id: currentUser.id,
+      },
     });
 
     // Guardar el usuario antes de retornarlo
