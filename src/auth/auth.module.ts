@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/models/user.entity';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard],
   controllers: [AuthController],

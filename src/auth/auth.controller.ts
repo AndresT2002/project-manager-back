@@ -25,6 +25,8 @@ import {
   LoginRequestDto,
   LoginResponseDto,
   LogoutResponseDto,
+  RegisterDto,
+  RegisterResponseDto,
 } from 'src/models/dtos/auth';
 import { User } from 'src/models/user.entity';
 import { Response } from 'express';
@@ -166,5 +168,20 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   getProfile(@GetUser() user: AuthenticatedUser): AuthenticatedUser {
     return user;
+  }
+
+  /*
+    Este método es para registrar un nuevo usuario.
+    Se utiliza en el controlador de autenticación para registrar un nuevo usuario.
+    Si el usuario y contraseña son válidos, se permite el acceso a la ruta y por ende se registra el usuario.
+  */
+  @ApiOperation({ summary: 'Registrar un nuevo usuario' })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({ status: 201, description: 'Usuario registrado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Usuario ya existe' })
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    return this.authService.register(registerDto);
   }
 }

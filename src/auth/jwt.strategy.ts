@@ -2,13 +2,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
+import { AuthenticatedUser } from './get-user.decorator';
+import { Role } from 'src/models/enums';
 
-interface JwtPayload {
+interface JwtPayload extends AuthenticatedUser {
   sub: string;
-  email: string;
-  role: string;
-  name: string;
-  fullName: string;
 }
 
 /*
@@ -28,11 +26,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload) {
+  validate(payload: JwtPayload): AuthenticatedUser {
     return {
       id: payload.sub,
       email: payload.email,
-      role: payload.role,
+      role: payload.role as Role,
       name: payload.name,
       fullName: payload.fullName,
     };

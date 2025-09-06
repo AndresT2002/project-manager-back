@@ -1,10 +1,22 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { LoginResponseDto } from 'src/models/dtos/auth';
+import {
+  LoginResponseDto,
+  RegisterDto,
+  RegisterResponseDto,
+} from 'src/models/dtos/auth';
 import { User } from 'src/models/user.entity';
+import { plainToInstance } from 'class-transformer';
+import { Role } from 'src/models/enums';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 interface JwtPayload {
   email: string;
@@ -24,6 +36,8 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   /*
@@ -151,5 +165,25 @@ export class AuthService {
       default:
         return 3600; // 1 hora por defecto
     }
+  }
+
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    const user = await this.userRepository.findOne({
+      where: { email: registerDto.email },
+    });
+    if (user) {
+      throw new BadRequestException('User already exists');
+    }
+    const newUser = await this.userRepository.create({
+      ...registerDto,
+      password: await bcrypt.hash(registerDto.password, 10),
+      fullName: `${registerDto.name} ${registerDto.lastName}`,
+      role: Role.LEADER,
+    });
+    await this.userRepository.save(newUser);
+    const userResponse = plainToInstance(RegisterResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+    return userResponse;
   }
 }
