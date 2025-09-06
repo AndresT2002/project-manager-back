@@ -16,8 +16,7 @@ import {
 } from 'src/models/dtos/project/get-projects-response.dto';
 import { UpdateProjectResponseDto } from 'src/models/dtos/project/update-project-response.dto';
 import { GetProjectsQueryDto } from 'src/models/dtos/project/get-projects-query.dto';
-import { GetProjectStatusCountsDto } from 'src/models/dtos/project/get-project-status-counts-response.dto';
-import { ProjectStatus, Role } from 'src/models/enums';
+import { GetProjectStatusCountsResponseDto } from 'src/models/dtos/project/get-project-status-counts-response.dto';
 import { AuthenticatedUser } from 'src/auth/get-user.decorator';
 import { ProjectStatusCountContext } from './strategies';
 
@@ -147,7 +146,7 @@ export class ProjectService {
    */
   async getProjectStatusCounts(
     user: AuthenticatedUser,
-  ): Promise<GetProjectStatusCountsDto> {
+  ): Promise<GetProjectStatusCountsResponseDto> {
     return this.projectStatusCountContext.executeStrategy(
       user,
       this.projectRepository,

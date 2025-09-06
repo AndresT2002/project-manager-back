@@ -1,28 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class GetProjectStatusCountsDto {
+export class GetProjectStatusCountsResponseDto {
   @ApiProperty({
     description: 'The number of open projects',
     example: 10,
   })
-  @IsNumber()
-  @IsNotEmpty()
-  readonly open: number;
+  open: number;
 
   @ApiProperty({
     description: 'The number of finished projects',
     example: 10,
   })
-  @IsNumber()
-  @IsNotEmpty()
-  readonly finished: number;
+  finished: number;
 
   @ApiProperty({
     description: 'The number of cancelled projects',
     example: 10,
   })
-  @IsNumber()
-  @IsNotEmpty()
-  readonly cancelled: number;
+  cancelled: number;
 }

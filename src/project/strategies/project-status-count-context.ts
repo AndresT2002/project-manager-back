@@ -6,7 +6,7 @@ import { AdminProjectStatusCountStrategy } from './admin-project-status-count.st
 import { LeaderProjectStatusCountStrategy } from './leader-project-status-count.strategy';
 import { MemberProjectStatusCountStrategy } from './member-project-status-count.strategy';
 import { AuthenticatedUser } from 'src/auth/get-user.decorator';
-import { GetProjectStatusCountsDto } from 'src/models/dtos/project/get-project-status-counts-response.dto';
+import { GetProjectStatusCountsResponseDto } from 'src/models/dtos/project/get-project-status-counts-response.dto';
 import { Role } from 'src/models/enums';
 
 /**
@@ -33,7 +33,7 @@ export class ProjectStatusCountContext {
   async executeStrategy(
     user: AuthenticatedUser,
     projectRepository: Repository<Project>,
-  ): Promise<GetProjectStatusCountsDto> {
+  ): Promise<GetProjectStatusCountsResponseDto> {
     const strategy = this.strategies.get(user.role);
 
     if (!strategy) {
