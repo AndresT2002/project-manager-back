@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto } from 'src/models/dtos/project/create-project-request.dto';
 import { UpdateProjectDto } from 'src/models/dtos/project/update-project-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,12 +16,17 @@ import {
 } from 'src/models/dtos/project/get-projects-response.dto';
 import { UpdateProjectResponseDto } from 'src/models/dtos/project/update-project-response.dto';
 import { GetProjectsQueryDto } from 'src/models/dtos/project/get-projects-query.dto';
+import { GetProjectStatusCountsDto } from 'src/models/dtos/project/get-project-status-counts-response.dto';
+import { ProjectStatus, Role } from 'src/models/enums';
+import { AuthenticatedUser } from 'src/auth/get-user.decorator';
+import { ProjectStatusCountContext } from './strategies';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
+    private projectStatusCountContext: ProjectStatusCountContext,
   ) {}
 
   async create(createProjectDto: CreateProjectDto) {
@@ -122,5 +131,26 @@ export class ProjectService {
       throw new NotFoundException('Project not found');
     }
     return true;
+  }
+
+  /**
+   * Método que obtiene el conteo de proyectos por status usando el patrón Strategy
+   * La estrategia específica se selecciona automáticamente según el rol del usuario
+   *
+   * Reglas por rol:
+   * - ADMIN: Obtiene el conteo de TODOS los proyectos por status
+   * - LEADER: Obtiene el conteo de proyectos donde es el propietario (owner)
+   * - MEMBER: Obtiene el conteo de proyectos donde es miembro
+   *
+   * @param user Usuario autenticado
+   * @returns Conteo de proyectos por status según el rol del usuario
+   */
+  async getProjectStatusCounts(
+    user: AuthenticatedUser,
+  ): Promise<GetProjectStatusCountsDto> {
+    return this.projectStatusCountContext.executeStrategy(
+      user,
+      this.projectRepository,
+    );
   }
 }
